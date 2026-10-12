@@ -51,8 +51,63 @@ public class MainActivity extends AppCompatActivity {
         locationText = findViewById(R.id.location_text);
         weatherText = findViewById(R.id.weather_text);
         emptyText = findViewById(R.id.empty_text);
+        findViewById(R.id.location_button).setOnClickListener(v -> askForLocation());
         findViewById(R.id.add_button).setOnClickListener(v -> showForm());
         showReports();
+    }
+
+    private void askForLocation() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_REQUEST);
+            return;
+        }
+        loadLocation();
+    }
+
+    @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                                      @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_REQUEST) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                loadLocation();
+            } else {
+                locationText.setText("Permiso denegado. Puedes guardar reportes sin ubicación.");
+            }
+        }
+    }
+
+    private void loadLocation() {
+        LocationManager manager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        boolean fine = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        String provider = fine && manager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                ? LocationManager.GPS_PROVIDER : LocationManager.NETWORK_PROVIDER;
+        if (!manager.isProviderEnabled(provider)) {
+            locationText.setText("Activa la ubicación del dispositivo e inténtalo de nuevo.");
+            return;
+        }
+        locationText.setText("Obteniendo ubicación…");
+        try {
+            if (Build.VERSION.SDK_INT >= 30) {
+                manager.getCurrentLocation(provider, new CancellationSignal(), getMainExecutor(), this::useLocation);
+            } else {
+                manager.requestSingleUpdate(provider, this::useLocation, null);
+            }
+        } catch (SecurityException e) {
+            locationText.setText("No se pudo acceder a la ubicación.");
+        }
+    }
+
+    private void useLocation(Location location) {
+        if (location == null) {
+            locationText.setText("Sin señal de ubicación. Inténtalo de nuevo.");
+            return;
+        }
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        locationText.setText(String.format(Locale.US, "Coordenadas: %.5f, %.5f", latitude, longitude));
     }
 
     private void showForm() {

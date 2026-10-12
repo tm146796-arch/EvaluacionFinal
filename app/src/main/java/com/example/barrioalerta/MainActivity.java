@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ReportDb db;
     private LinearLayout reportList;
     private TextView locationText, weatherText, emptyText;
+    private MaterialButton locationButton;
     private Double latitude, longitude;
 
     @Override protected void onCreate(Bundle state) {
@@ -51,7 +52,8 @@ public class MainActivity extends AppCompatActivity {
         locationText = findViewById(R.id.location_text);
         weatherText = findViewById(R.id.weather_text);
         emptyText = findViewById(R.id.empty_text);
-        findViewById(R.id.location_button).setOnClickListener(v -> askForLocation());
+        locationButton = findViewById(R.id.location_button);
+        locationButton.setOnClickListener(v -> askForLocation());
         findViewById(R.id.add_button).setOnClickListener(v -> showForm());
         showReports();
     }
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
             locationText.setText("Activa la ubicación del dispositivo e inténtalo de nuevo.");
             return;
         }
+        locationButton.setEnabled(false);
         locationText.setText("Obteniendo ubicación…");
         try {
             if (Build.VERSION.SDK_INT >= 30) {
@@ -97,12 +100,14 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (SecurityException e) {
             locationText.setText("No se pudo acceder a la ubicación.");
+            locationButton.setEnabled(true);
         }
     }
 
     private void useLocation(Location location) {
         if (location == null) {
             locationText.setText("Sin señal de ubicación. Inténtalo de nuevo.");
+            locationButton.setEnabled(true);
             return;
         }
         latitude = location.getLatitude();
@@ -137,7 +142,10 @@ public class MainActivity extends AppCompatActivity {
                 if (connection != null) connection.disconnect();
             }
             final String result = message;
-            runOnUiThread(() -> weatherText.setText(result));
+            runOnUiThread(() -> {
+                weatherText.setText(result);
+                locationButton.setEnabled(true);
+            });
         });
     }
 

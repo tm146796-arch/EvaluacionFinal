@@ -108,6 +108,37 @@ public class MainActivity extends AppCompatActivity {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         locationText.setText(String.format(Locale.US, "Coordenadas: %.5f, %.5f", latitude, longitude));
+        fetchWeather(latitude, longitude);
+    }
+
+    /** Consulta REST por HTTPS fuera del hilo principal para no congelar la interfaz. */
+    private void fetchWeather(double lat, double lon) {
+        weatherText.setText("Consultando Open-Meteo…");
+        network.execute(() -> {
+            HttpURLConnection connection = null;
+            String message;
+            try {
+                String address = String.format(Locale.US,
+                        "https://api.open-meteo.com/v1/forecast?latitude=%.5f&longitude=%.5f&current=temperature_2m,wind_speed_10m",
+                        lat, lon);
+                connection = (HttpURLConnection) new URL(address).openConnection();
+                connection.setConnectTimeout(8000);
+                connection.setReadTimeout(8000);
+                if (connection.getResponseCode() != 200) throw new Exception("HTTP " + connection.getResponseCode());
+                try (InputStream input = connection.getInputStream()) {
+                    JSONObject current = new JSONObject(new String(input.readAllBytes(), StandardCharsets.UTF_8))
+                            .getJSONObject("current");
+                    message = String.format(Locale.getDefault(), "Clima actual: %.1f °C · viento %.1f km/h",
+                            current.getDouble("temperature_2m"), current.getDouble("wind_speed_10m"));
+                }
+            } catch (Exception e) {
+                message = "Clima no disponible. Los reportes siguen funcionando sin internet.";
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+            final String result = message;
+            runOnUiThread(() -> weatherText.setText(result));
+        });
     }
 
     private void showForm() {

@@ -25,6 +25,10 @@ La primera compilación necesita conexión para descargar dependencias. Los arch
 
 APK de prueba: [descargar desde Google Drive](https://drive.google.com/file/d/1tiNKGOXwl2ii9iHNRa7GE7zORmXn3oAD/view?usp=sharing).
 
+Video demo: [ver en Google Drive](https://drive.google.com/file/d/1fEw8CVTrITTfeX42vLdJRUgukWK3OVz_/view?usp=sharing).
+
+Base de datos de prueba: [descargar desde Google Drive](https://drive.google.com/file/d/1t9GJbl1rVTuhCsYiM6-gHyneLFrVX8XL/view?usp=sharing).
+
 ## Estructura
 
 | Ruta | Contenido |

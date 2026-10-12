@@ -121,8 +121,31 @@ public class MainActivity extends AppCompatActivity {
             detail.setPadding(0, dp(6), 0, 0);
             content.addView(detail);
             card.addView(content);
+            card.setOnClickListener(v -> showReportDetail(report));
             reportList.addView(card);
         }
+    }
+
+    private void showReportDetail(ReportDb.Report report) {
+        String coordinates = report.lat == null ? "Sin coordenadas" :
+                String.format(Locale.US, "%.5f, %.5f", report.lat, report.lon);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(report.title)
+                .setMessage("Categoría: " + report.category + "\nEstado: " + report.status +
+                        "\nUbicación: " + coordinates + "\n\n" + report.description)
+                .setPositiveButton(report.status.equals("Pendiente") ? "Marcar resuelto" : "Reabrir", (d, w) -> {
+                    db.toggleStatus(report.id, report.status);
+                    showReports();
+                })
+                .setNeutralButton("Eliminar", (d, w) -> new MaterialAlertDialogBuilder(this)
+                        .setTitle("Eliminar reporte")
+                        .setMessage("Esta acción no se puede deshacer.")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Eliminar", (confirm, button) -> {
+                            db.delete(report.id);
+                            showReports();
+                        }).show())
+                .setNegativeButton("Cerrar", null).show();
     }
 
     private int dp(int value) {

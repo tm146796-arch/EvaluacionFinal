@@ -1,0 +1,27 @@
+# Android Studio y Gradle
+.gradle/
+.idea/
+**/build/
+*.iml
+local.properties
+
+# Entregables y capturas: permanecen solo en el equipo local
+/entrega/
+/evidencias/
+/captures/
+
+# Archivos locales y temporales
+.DS_Store
+*.log
+*.hprof
+*.tmp
+*.db-journal
+*.db-wal
+*.db-shm
+.externalNativeBuild/
+.cxx/
+
+# Claves de firma privadas
+*.jks
+*.keystore
+*.key

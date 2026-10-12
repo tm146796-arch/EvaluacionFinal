@@ -23,6 +23,8 @@ Requiere Android Studio, SDK de Android 36 y un dispositivo o emulador con Andro
 
 La primera compilación necesita conexión para descargar dependencias. Los archivos `local.properties`, los directorios `build/` y la carpeta `.gradle/` se crean localmente y están excluidos de Git.
 
+APK de prueba: [descargar desde Google Drive](https://drive.google.com/file/d/1tiNKGOXwl2ii9iHNRa7GE7zORmXn3oAD/view?usp=sharing).
+
 ## Estructura
 
 | Ruta | Contenido |
